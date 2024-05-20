@@ -315,17 +315,10 @@ fi
 
 ###############################################################################
 # Configure SSH Agent
-# TODO: If the passphrase wasn't entered on the first time, the script will not
-# autoload the key during the next session since the agent is running.
-# 	ERROR: "Could not open a connection to your authentication agent."
 ###############################################################################
 if [ -z "$SSH_AUTH_SOCK" ]; then
-    if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-        eval $(ssh-agent -s)
-    fi
-    if [ -f ~/.ssh/id_rsa ]; then
-        ssh-add ~/.ssh/id_rsa
-    fi
+  eval $(ssh-agent -s)
+  ssh-add ~/.ssh/id_rsa
 fi
 
 ###############################################################################
