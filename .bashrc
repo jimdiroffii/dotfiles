@@ -99,7 +99,7 @@ elif [[ -f /etc/os-release ]]; then
 	. /etc/os-release
 	if [[ "$ID_LIKE" == *debian* ]]; then
 			OS="debian"
-	elif [[ "$ID_LIKE" == *fedora* ]]; then
+	elif [[ "$ID" == *fedora* ]]; then
 			OS="fedora"
 	else
 			OS="$ID_LIKE"
