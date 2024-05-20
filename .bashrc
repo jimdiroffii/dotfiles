@@ -97,7 +97,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 	OS="macos"
 elif [[ -f /etc/os-release ]]; then
 	. /etc/os-release
-	if [[ "$ID_LIKE" == *debian* ]]; then
+	if [[ "$ID" == *debian* ]] || [[ "$ID_LIKE" == *debian* ]]; then
 			OS="debian"
 	elif [[ "$ID" == *fedora* ]]; then
 			OS="fedora"
