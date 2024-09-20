@@ -4,7 +4,7 @@
 # Github: @jimdiroffii
 # 		https://github.com/jimdiroffii/dotfiles
 #
-# Modifications in progress. Default zshrc settings from Kali 2024. 
+# Modifications in progress. Default zshrc settings from Kali 2024.
 #
 # ~/.zshrc file for zsh interactive shells.
 # see /usr/share/doc/zsh/examples/zshrc for examples
@@ -75,12 +75,12 @@ TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S\ncpu\t%P'
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
+  debian_chroot=$(cat /etc/debian_chroot)
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+  xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -89,36 +89,36 @@ esac
 force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-        # We have color support; assume it's compliant with Ecma-48
-        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-        # a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-    else
-        color_prompt=
-    fi
+  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+  else
+    color_prompt=
+  fi
 fi
 
 configure_prompt() {
-    prompt_symbol=㉿
-    # Skull emoji for root terminal
-    #[ "$EUID" -eq 0 ] && prompt_symbol=💀
-    case "$PROMPT_ALTERNATIVE" in
-        twoline)
-            PROMPT=$'%F{%(#.blue.green)}┌──${debian_chroot:+($debian_chroot)─}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))─}(%B%F{%(#.red.blue)}%n'$prompt_symbol$'%m%b%F{%(#.blue.green)})-[%B%F{reset}%(6~.%-1~/…/%4~.%5~)%b%F{%(#.blue.green)}]\n└─%B%(#.%F{red}#.%F{blue}$)%b%F{reset} '
-            # Right-side prompt with exit codes and background processes
-            #RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
-            ;;
-        oneline)
-            PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{%(#.red.blue)}%n@%m%b%F{reset}:%B%F{%(#.blue.green)}%~%b%F{reset}%(#.#.$) '
-            RPROMPT=
-            ;;
-        backtrack)
-            PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{red}%n@%m%b%F{reset}:%B%F{blue}%~%b%F{reset}%(#.#.$) '
-            RPROMPT=
-            ;;
-    esac
-    unset prompt_symbol
+  prompt_symbol=㉿
+  # Skull emoji for root terminal
+  #[ "$EUID" -eq 0 ] && prompt_symbol=💀
+  case "$PROMPT_ALTERNATIVE" in
+    twoline)
+      PROMPT=$'%F{%(#.blue.green)}┌──${debian_chroot:+($debian_chroot)─}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))─}(%B%F{%(#.red.blue)}%n'$prompt_symbol$'%m%b%F{%(#.blue.green)})-[%B%F{reset}%(6~.%-1~/…/%4~.%5~)%b%F{%(#.blue.green)}]\n└─%B%(#.%F{red}#.%F{blue}$)%b%F{reset} '
+      # Right-side prompt with exit codes and background processes
+      #RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
+    ;;
+    oneline)
+      PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{%(#.red.blue)}%n@%m%b%F{reset}:%B%F{%(#.blue.green)}%~%b%F{reset}%(#.#.$) '
+      RPROMPT=
+    ;;
+    backtrack)
+      PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{red}%n@%m%b%F{reset}:%B%F{blue}%~%b%F{reset}%(#.#.$) '
+      RPROMPT=
+    ;;
+  esac
+  unset prompt_symbol
 }
 
 # The following block is surrounded by two delimiters.
@@ -129,123 +129,123 @@ NEWLINE_BEFORE_PROMPT=yes
 # STOP KALI CONFIG VARIABLES
 
 if [ "$color_prompt" = yes ]; then
-    # override default virtualenv indicator in prompt
-    VIRTUAL_ENV_DISABLE_PROMPT=1
-
-    configure_prompt
-
-    # enable syntax-highlighting
-    if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-        . /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-        ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
-        ZSH_HIGHLIGHT_STYLES[default]=none
-        ZSH_HIGHLIGHT_STYLES[unknown-token]=underline
-        ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
-        ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
-        ZSH_HIGHLIGHT_STYLES[global-alias]=fg=green,bold
-        ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
-        ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
-        ZSH_HIGHLIGHT_STYLES[path]=bold
-        ZSH_HIGHLIGHT_STYLES[path_pathseparator]=
-        ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]=
-        ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[command-substitution]=none
-        ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[process-substitution]=none
-        ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
-        ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
-        ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
-        ZSH_HIGHLIGHT_STYLES[back-quoted-argument-delimiter]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
-        ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
-        ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
-        ZSH_HIGHLIGHT_STYLES[rc-quote]=fg=magenta
-        ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[assign]=none
-        ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
-        ZSH_HIGHLIGHT_STYLES[named-fd]=none
-        ZSH_HIGHLIGHT_STYLES[numeric-fd]=none
-        ZSH_HIGHLIGHT_STYLES[arg0]=fg=cyan
-        ZSH_HIGHLIGHT_STYLES[bracket-error]=fg=red,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-1]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-2]=fg=green,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-3]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
-        ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
-    fi
+  # override default virtualenv indicator in prompt
+  VIRTUAL_ENV_DISABLE_PROMPT=1
+  
+  configure_prompt
+  
+  # enable syntax-highlighting
+  if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    . /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+    ZSH_HIGHLIGHT_STYLES[default]=none
+    ZSH_HIGHLIGHT_STYLES[unknown-token]=underline
+    ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
+    ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[global-alias]=fg=green,bold
+    ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[path]=bold
+    ZSH_HIGHLIGHT_STYLES[path_pathseparator]=
+    ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]=
+    ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[command-substitution]=none
+    ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[process-substitution]=none
+    ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
+    ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument-delimiter]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[rc-quote]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[assign]=none
+    ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
+    ZSH_HIGHLIGHT_STYLES[named-fd]=none
+    ZSH_HIGHLIGHT_STYLES[numeric-fd]=none
+    ZSH_HIGHLIGHT_STYLES[arg0]=fg=cyan
+    ZSH_HIGHLIGHT_STYLES[bracket-error]=fg=red,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-1]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-2]=fg=green,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-3]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
+    ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
+  fi
 else
-    PROMPT='${debian_chroot:+($debian_chroot)}%n@%m:%~%(#.#.$) '
+  PROMPT='${debian_chroot:+($debian_chroot)}%n@%m:%~%(#.#.$) '
 fi
 unset color_prompt force_color_prompt
 
 toggle_oneline_prompt(){
-    if [ "$PROMPT_ALTERNATIVE" = oneline ]; then
-        PROMPT_ALTERNATIVE=twoline
-    else
-        PROMPT_ALTERNATIVE=oneline
-    fi
-    configure_prompt
-    zle reset-prompt
+  if [ "$PROMPT_ALTERNATIVE" = oneline ]; then
+    PROMPT_ALTERNATIVE=twoline
+  else
+    PROMPT_ALTERNATIVE=oneline
+  fi
+  configure_prompt
+  zle reset-prompt
 }
 zle -N toggle_oneline_prompt
 bindkey ^P toggle_oneline_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*|Eterm|aterm|kterm|gnome*|alacritty)
+  xterm*|rxvt*|Eterm|aterm|kterm|gnome*|alacritty)
     TERM_TITLE=$'\e]0;${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%n@%m: %~\a'
-    ;;
-*)
-    ;;
+  ;;
+  *)
+  ;;
 esac
 
 precmd() {
-    # Print the previously configured title
-    print -Pnr -- "$TERM_TITLE"
-
-    # Print a new line before the prompt, but only if it is not the first line
-    if [ "$NEWLINE_BEFORE_PROMPT" = yes ]; then
-        if [ -z "$_NEW_LINE_BEFORE_PROMPT" ]; then
-            _NEW_LINE_BEFORE_PROMPT=1
-        else
-            print ""
-        fi
+  # Print the previously configured title
+  print -Pnr -- "$TERM_TITLE"
+  
+  # Print a new line before the prompt, but only if it is not the first line
+  if [ "$NEWLINE_BEFORE_PROMPT" = yes ]; then
+    if [ -z "$_NEW_LINE_BEFORE_PROMPT" ]; then
+      _NEW_LINE_BEFORE_PROMPT=1
+    else
+      print ""
     fi
+  fi
 }
 
 # enable color support of ls, less and man, and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    export LS_COLORS="$LS_COLORS:ow=30;44:" # fix ls color for folders with 777 permissions
-
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-    alias diff='diff --color=auto'
-    alias ip='ip --color=auto'
-
-    export LESS_TERMCAP_mb=$'\E[1;31m'     # begin blink
-    export LESS_TERMCAP_md=$'\E[1;36m'     # begin bold
-    export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
-    export LESS_TERMCAP_so=$'\E[01;33m'    # begin reverse video
-    export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
-    export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
-    export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
-
-    # Take advantage of $LS_COLORS for completion as well
-    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-    zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  export LS_COLORS="$LS_COLORS:ow=30;44:" # fix ls color for folders with 777 permissions
+  
+  alias ls='ls --color=auto'
+  #alias dir='dir --color=auto'
+  #alias vdir='vdir --color=auto'
+  
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
+  alias diff='diff --color=auto'
+  alias ip='ip --color=auto'
+  
+  export LESS_TERMCAP_mb=$'\E[1;31m'     # begin blink
+  export LESS_TERMCAP_md=$'\E[1;36m'     # begin bold
+  export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
+  export LESS_TERMCAP_so=$'\E[01;33m'    # begin reverse video
+  export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
+  export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
+  export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
+  
+  # Take advantage of $LS_COLORS for completion as well
+  zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+  zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 fi
 
 # some more ls aliases
@@ -255,32 +255,32 @@ fi
 
 # enable auto-suggestions based on the history
 if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
-    . /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-    # change suggestion color
-    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#999'
+  . /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+  # change suggestion color
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#999'
 fi
 
 # enable command-not-found if installed
 if [ -f /etc/zsh_command_not_found ]; then
-    . /etc/zsh_command_not_found
+  . /etc/zsh_command_not_found
 fi
 
 ###############################################################################
 # Determine the OS
 ###############################################################################
 if [[ "$(uname)" == "Darwin" ]]; then
-        OS="macos"
-elif [[ -f /etc/os-release ]]; then
-        . /etc/os-release
-        if [[ "$ID" == *debian* ]] || [[ "$ID_LIKE" == *debian* ]]; then
-                        OS="debian"
-        elif [[ "$ID" == *fedora* ]]; then
-                        OS="fedora"
-        else
-                        OS="$ID_LIKE"
-        fi
+  OS="macos"
+  elif [[ -f /etc/os-release ]]; then
+  source /etc/os-release
+  if [[ "$ID" == *debian* ]] || [[ "$ID_LIKE" == *debian* ]]; then
+    OS="debian"
+    elif [[ "$ID" == *fedora* ]]; then
+    OS="fedora"
+  else
+    OS="$ID_LIKE"
+  fi
 else
-        echo -e "~/.bashrc error. Unknown OS. Some features might not work.\n"
+  echo "Unknown OS. Some features might not work."
 fi
 
 ###############################################################################
@@ -306,25 +306,24 @@ alias .6='cd ../../../../../../'            # Go back 6 directory levels
 # Get Public IP
 ###############################################################################
 if ! command -v curl &> /dev/null; then
-        echo -e "Consider installing 'curl'\n"
+  echo "Consider installing 'curl'"
 else
-        #alias myip='echo "public: " && curl ipinfo.io/ip && echo'    # get public IP address and print a new line
-	alias myip=my_ip_address()
-	alias myIP='myip'
-        alias myIp='myip'
+  alias myip='my_ip_addresses'
+  alias myIP='myip'
+  alias myIp='myip'
 fi
 
 my_ip_addresses() {
-	echo -e "public: "
-	curl ipinfo.io/ip && echo
-	echo -e "local: "
-	hostname -I && echo
+  echo "public: "
+  curl ipinfo.io/ip && echo
+  echo "local: "
+  hostname -I && echo
 }
 
 ###############################################################################
 # Configure SSH Agent
 ###############################################################################
-if [ -z "$SSH_AUTH_SOCK" ]; then
+if [[ -z "$SSH_AUTH_SOCK" ]]; then
   eval $(ssh-agent -s)
   ssh-add ~/.ssh/id_rsa
 fi
@@ -333,17 +332,17 @@ fi
 # View Open Ports
 ###############################################################################
 if [[ "$OS" == "macos" ]]; then
-        if ! command -v lsof &> /dev/null; then
-                echo -e "Consider installing 'lsof'\n"
-        else
-	        alias openports='sudo lsof -iTCP -iUDP -n -P | grep -i "listen"'
-        fi
-elif [[ "$OS" == "debian" ]] || [[ "$OS" == "fedora" ]]; then
-        if ! command -v netstat &> /dev/null; then
-                echo -e "Consider installing 'netstat (net-tools)'\n"
-        elif ! command -v lsof &> /dev/null; then
-                echo -e "Consider installing 'lsof'\n"
-        else
-	        alias openports='netstat -tulpn | grep -i "listen" && echo && lsof -i | grep -i "listen"'
-        fi
+  if ! command -v lsof &> /dev/null; then
+    echo "Consider installing 'lsof'"
+  else
+    alias openports='sudo lsof -iTCP -iUDP -n -P | grep -i "listen"'
+  fi
+  elif [[ "$OS" == "debian" ]] || [[ "$OS" == "fedora" ]]; then
+  if ! command -v netstat &> /dev/null; then
+    echo "Consider installing 'netstat (net-tools)'"
+    elif ! command -v lsof &> /dev/null; then
+    echo "Consider installing 'lsof'"
+  else
+    alias openports='netstat -tulpn | grep -i "listen" && echo && lsof -i | grep -i "listen"'
+  fi
 fi
