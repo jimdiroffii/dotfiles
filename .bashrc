@@ -443,3 +443,10 @@ if [ -d $NVM_DIR ]; then
 	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 fi
 
+# ------------------------------------------------------------
+# Laravel / Composer
+# ------------------------------------------------------------
+COMPOSER_BIN="$HOME/.config/composer/vendor/bin"
+if [ -d $COMPOSER_BIN ]; then
+	export PATH="$PATH:$COMPOSER_BIN"
+fi
