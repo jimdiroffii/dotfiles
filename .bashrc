@@ -450,3 +450,11 @@ COMPOSER_BIN="$HOME/.config/composer/vendor/bin"
 if [ -d $COMPOSER_BIN ]; then
 	export PATH="$PATH:$COMPOSER_BIN"
 fi
+
+# ------------------------------------------------------------
+# Go
+# ------------------------------------------------------------
+GO_BIN="/usr/local/go/bin"
+if [ -d $GO_BIN ]; then
+  export PATH="$PATH:/usr/local/go/bin"
+fi
