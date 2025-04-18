@@ -433,6 +433,17 @@ backup_dir_function() {
 # ------------------------------------------------------------
 export GPG_TTY=$(tty)
 
+# Wheelhouse for CTF VMs
+if [ -d /hax/.cache/wheelhouse ]; then
+  if [[ -z "${PIP_FIND_LINKS:-}" ]] || [[ "$PIP_FIND_LINKS" != *"file:///hax/.cache/wheelhouse"* ]]; then
+    export PIP_FIND_LINKS="file:///hax/.cache/wheelhouse"
+  fi
+
+  if [[ ":${PYTHONPATH:-}:" != *":/hax/lib:"* ]]; then
+    export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}/hax/lib"
+  fi
+fi
+
 # ------------------------------------------------------------
 # nvm / node / npm
 # ------------------------------------------------------------
