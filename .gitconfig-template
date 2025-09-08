@@ -1,0 +1,21 @@
+[user]
+	name = REPLACE
+	email = REPLACE
+	signingkey = REPLACE
+[core]
+	editor = vim
+[pull]
+	rebase = true
+[color]
+	ui = true
+[credential]
+	helper = cache
+[commit]
+	gpgsign = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	defaultBranch = main
