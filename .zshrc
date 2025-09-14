@@ -99,7 +99,44 @@ compdef _directories md
 
 # Define aliases.
 alias tree='tree -a -I .git'
-alias ls='ls --color=auto --group-directories-first'
+
+###
+# Determine OS
+###
+if [[ "$(uname)" == "Darwin" ]]; then
+	OS="macos"
+elif [[ -f /etc/os-release ]]; then
+	. /etc/os-release
+	if [[ "$ID" == *debian* ]] || [[ "$ID_LIKE" == *debian* ]]; then
+		OS="debian"
+	fi
+else
+	echo -e ".zshrc error. Unknown OS. Some features might not work.\n"
+fi
+
+if [[ "$OS" == "macos" ]]; then
+    if ! command -v gls &> /dev/null; then
+        echo -e "Consider installing 'coreutils' with brew\n"
+        # Unset any existing ls alias first
+        unalias ls 2>/dev/null || true
+        # Custom ls function that mimics --group-directories-first
+        function ls() {
+            command ls -GC "$@" | awk '
+            BEGIN { dirs_count = 0; files_count = 0 }
+            /\/$/ { dirs[++dirs_count] = $0; next }
+            { files[++files_count] = $0 }
+            END {
+                for (i = 1; i <= dirs_count; i++) print dirs[i]
+                for (i = 1; i <= files_count; i++) print files[i]
+            }'
+        }
+    else
+        alias ls='gls -C --color=auto --group-directories-first'
+    fi
+else
+    alias ls='ls -C --color=auto --group-directories-first'
+fi
+
 alias ll='ls -FGlAhp'
 alias la='ls -ACF'
 
@@ -115,27 +152,12 @@ alias .5='cd ../../../../../'
 alias .6='cd ../../../../../../'
 
 # Add flags to existing aliases.
-alias ls="${aliases[ls]:-ls} -A"
+#alias ls="${aliases[ls]:-ls} -A"
 
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 
-# Custom Aliases
-
-###
-# Determine OS
-###
-if [[ "$(uname)" == "Darwin" ]]; then
-	OS="macos"
-elif [[ -f /etc/os-release ]]; then
-	. /etc/os-release
-	if [[ "$ID" == *debian* ]] || [[ "$ID_LIKE" == *debian* ]]; then
-		OS="debian"
-	fi
-else
-	echo -e ".zshrc error. Unknown OS. Some features might not work.\n"
-fi
 
 ###
 # Get Public IP
