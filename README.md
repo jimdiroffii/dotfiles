@@ -16,4 +16,6 @@ Copy the following files to the home directory.
 
 Install the [MesloLGS Nerd Font patched for Powerlevel10k](https://github.com/romkatv/powerlevel10k/blob/master/font.md).
 
+The MesloLGS font files were added to this repository in `./fonts`.
+
 And setup the SSH configuration if SSH copying of zsh files is wanted.
