@@ -151,6 +151,8 @@ alias .4='cd ../../../../'
 alias .5='cd ../../../../../'
 alias .6='cd ../../../../../../'
 
+alias diff='diff --color=auto -u'
+
 # Add flags to existing aliases.
 #alias ls="${aliases[ls]:-ls} -A"
 
