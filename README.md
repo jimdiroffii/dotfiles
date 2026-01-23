@@ -10,6 +10,7 @@ Ensure `zsh` is installed, of course.
 
 Copy the following files to the home directory.
 
+- `.zprofile`
 - `.zshenv`
 - `.zshrc`
 - `.p10k.zsh`
