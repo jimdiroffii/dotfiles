@@ -211,3 +211,11 @@ if [ -d $NVM_DIR ]; then
 	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 fi
+
+###
+# Configure SSH Agent
+###
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval $(ssh-agent -s)
+  ssh-add ~/.ssh/id_rsa
+fi
