@@ -4,19 +4,26 @@ Configuration files for common shells, applications and services such as bash, z
 
 ## ZSH Configuration (zsh4humans)
 
-These are the core files for setting up [zsh4humans](https://github.com/romkatv/zsh4humans/tree/master).
+Instructions for setting up [zsh4humans](https://github.com/romkatv/zsh4humans/tree/master).
 
-Ensure `zsh` is installed, of course.
+1) Ensure `zsh` is installed, of course.
 
-Copy the following files to the home directory.
+```bash
+sudo apt install zsh
+```
+
+2) Copy the following files to the home directory.
 
 - `.zprofile`
 - `.zshenv`
 - `.zshrc`
 - `.p10k.zsh`
 
-Install the [MesloLGS Nerd Font patched for Powerlevel10k](https://github.com/romkatv/powerlevel10k/blob/master/font.md).
+*Note: Use `.p10k.zsh-server` for minimal config that excludes glyphs, rename to `p10k.zsh`*
 
-The MesloLGS font files were added to this repository in `./fonts`.
+3) Install the [MesloLGS Nerd Font patched for Powerlevel10k](https://github.com/romkatv/powerlevel10k/blob/master/font.md).
 
-And setup the SSH configuration if SSH copying of zsh files is wanted.
+*The MesloLGS font files were added to this repository in `./fonts`.*
+
+4) And setup the SSH configuration (copy `.ssh/config`), if SSH push/copy of zsh files is wanted.
+

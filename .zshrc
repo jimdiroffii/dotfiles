@@ -69,12 +69,6 @@ export GPG_TTY=$TTY
 # Source additional local files if they exist.
 z4h source ~/.env.zsh
 
-# Use additional Git repositories pulled in with `z4h install`.
-#
-# This is just an example that you should delete. It does nothing useful.
-#z4h source ohmyzsh/ohmyzsh/lib/diagnostics.zsh  # source an individual file
-#z4h load   ohmyzsh/ohmyzsh/plugins/emoji-clock  # load a plugin
-
 # Define key bindings.
 z4h bindkey z4h-backward-kill-word  Ctrl+Backspace     Ctrl+H
 z4h bindkey z4h-backward-kill-zword Ctrl+Alt+Backspace
@@ -160,6 +154,13 @@ alias diff='diff --color=auto -u'
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 
+###
+# Git
+###
+alias gs='git status'
+alias gf='git fetch'
+alias ga='git add .'
+alias gc='git commit -S -m '
 
 ###
 # Get Public IP
