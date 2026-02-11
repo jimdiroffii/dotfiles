@@ -459,7 +459,7 @@ fi
 # ------------------------------------------------------------
 COMPOSER_BIN="$HOME/.config/composer/vendor/bin"
 if [ -d $COMPOSER_BIN ]; then
-	export PATH="$PATH:$COMPOSER_BIN"
+	export PATH="$COMPOSER_BIN:$PATH"
 fi
 
 # ------------------------------------------------------------
@@ -467,5 +467,25 @@ fi
 # ------------------------------------------------------------
 GO_BIN="/usr/local/go/bin"
 if [ -d $GO_BIN ]; then
-  export PATH="$PATH:/usr/local/go/bin"
+  export PATH="$GO_BIN:$PATH"
+fi
+
+# ------------------------------------------------------------
+# Rust
+# ------------------------------------------------------------
+RUST_BIN="$HOME/.cargo/bin"
+if [ -d $RUST_BIN ]; then
+  export PATH="$RUST_BIN:$PATH"
+fi
+
+# ------------------------------------------------------------
+# GHCup / Haskell / Cabal
+# ------------------------------------------------------------
+GHC_BIN="$HOME/.ghcup/bin"
+CABAL_BIN="$HOME/.cabal/bin"
+if [ -d $GHC_BIN ]; then
+  export PATH="$GHC_BIN:$PATH"
+fi
+if [ -d $CABAL_BIN ]; then
+  export PATH="$CABAL_BIN:$PATH"
 fi
