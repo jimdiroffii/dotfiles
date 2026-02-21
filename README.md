@@ -14,12 +14,12 @@ sudo apt install zsh
 
 2) Copy the following files to the home directory.
 
-- `.zprofile`
 - `.zshenv`
 - `.zshrc`
 - `.p10k.zsh`
 
-*Note: Use `.p10k.zsh-server` for minimal config that excludes glyphs, rename to `p10k.zsh`*
+~~*Note: Use `.p10k.zsh-server` for minimal config that excludes glyphs, rename to `p10k.zsh`*~~
+*Note 2: `.p10k.zsh` was reconfigured to use a minimal config, no glyphs, by default*
 
 3) Install the [MesloLGS Nerd Font patched for Powerlevel10k](https://github.com/romkatv/powerlevel10k/blob/master/font.md).
 
