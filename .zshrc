@@ -13,11 +13,8 @@ zstyle ':z4h:' auto-update-days '28'
 # Keyboard type: 'mac' or 'pc'.
 zstyle ':z4h:bindkey' keyboard  'pc'
 
-# Start tmux if not already in tmux.
-#zstyle ':z4h:' start-tmux command tmux -u new -A -D -t z4h
-
-# Whether to move prompt to the bottom when zsh starts and on Ctrl+L.
-zstyle ':z4h:' prompt-at-bottom 'no'
+# Don't start tmux.
+zstyle ':z4h:' start-tmux       no
 
 # Mark up shell's output with semantic information.
 zstyle ':z4h:' term-shell-integration 'yes'
@@ -38,21 +35,12 @@ zstyle ':z4h:direnv:success' notify 'yes'
 # SSH when connecting to these hosts.
 #zstyle ':z4h:ssh:example-hostname1'   enable 'yes'
 #zstyle ':z4h:ssh:*.example-hostname2' enable 'no'
-zstyle ':z4h:ssh:phantom' enable 'yes'
-
 # The default value if none of the overrides above match the hostname.
 zstyle ':z4h:ssh:*'                   enable 'no'
 
 # Send these files over to the remote host when connecting over SSH to the
 # enabled hosts.
 zstyle ':z4h:ssh:*' send-extra-files '~/.nanorc' '~/.env.zsh'
-
-# Clone additional Git repositories from GitHub.
-#
-# This doesn't do anything apart from cloning the repository and keeping it
-# up-to-date. Cloned files can be used after `z4h init`. This is just an
-# example. If you don't plan to use Oh My Zsh, delete this line.
-# z4h install ohmyzsh/ohmyzsh || return
 
 # Install or update core components (fzf, zsh-autosuggestions, etc.) and
 # initialize Zsh. After this point console I/O is unavailable until Zsh
@@ -91,51 +79,151 @@ compdef _directories md
 # Define named directories: ~w <=> Windows home directory on WSL.
 [[ -z $z4h_win_home ]] || hash -d w=$z4h_win_home
 
-# Define aliases.
-alias tree='tree -a -I .git'
+# Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
+setopt glob_dots     # no special treatment for file names with a leading dot
+setopt no_auto_menu  # require an extra TAB press to open the completion menu
 
-###
-# Determine OS
-###
-if [[ "$(uname)" == "Darwin" ]]; then
-	OS="macos"
-elif [[ -f /etc/os-release ]]; then
-	. /etc/os-release
-	if [[ "$ID" == *debian* ]] || [[ "$ID_LIKE" == *debian* ]]; then
-		OS="debian"
-	fi
-else
-	echo -e ".zshrc error. Unknown OS. Some features might not work.\n"
-fi
+###############################################################################
+###############################################################################
+#                    Custom Configuration Options                             #
+#                                                                             #
+#                              Notes                                          #
+#                                                                             #
+# - Checking for OS type function removed. ZSH includes a variable $OSTYPE    #
+#   that performs the detection automatically. Updated conditionals to use    #
+#   case statements with this variable to check for MacOS and Linux systems.  #
+###############################################################################
 
-if [[ "$OS" == "macos" ]]; then
-    if ! command -v gls &> /dev/null; then
-        echo -e "Consider installing 'coreutils' with brew\n"
-        # Unset any existing ls alias first
-        unalias ls 2>/dev/null || true
-        # Custom ls function that mimics --group-directories-first
-        function ls() {
-            command ls -GC "$@" | awk '
-            BEGIN { dirs_count = 0; files_count = 0 }
-            /\/$/ { dirs[++dirs_count] = $0; next }
-            { files[++files_count] = $0 }
-            END {
-                for (i = 1; i <= dirs_count; i++) print dirs[i]
-                for (i = 1; i <= files_count; i++) print files[i]
-            }'
-        }
-    else
-        alias ls='gls -C --color=auto --group-directories-first'
+###############################################################################
+# PATH Extensions
+###############################################################################
+# Helper function to dynamically and safely construct PATH
+add_to_path() {
+    if [[ -d "$1" ]]; then
+        export PATH="$1:$PATH"
     fi
-else
-    alias ls='ls -C --color=auto --group-directories-first'
+}
+
+###
+# 1. System & Package Managers
+###
+# Apple Silicon (M-series) Macs
+add_to_path "/opt/homebrew/bin"
+add_to_path "/opt/homebrew/sbin"
+
+###
+# 2. Developer Tools & Languages
+###
+# Laravel / Composer
+add_to_path "$HOME/.config/composer/vendor/bin"
+add_to_path "$HOME/.composer/vendor/bin" # Fallback for older composer setups
+
+# Go
+add_to_path "/usr/local/go/bin" # System binaries
+add_to_path "$HOME/go/bin"      # Workspace binaries (go install)
+
+# Rust
+add_to_path "$HOME/.cargo/bin"
+
+# GHCup / Haskell / Cabal
+add_to_path "$HOME/.ghcup/bin"
+add_to_path "$HOME/.cabal/bin"
+
+###############################################################################
+# Universal Dependency Installer
+###############################################################################
+prompt_install() {
+    local cmd_name="$1"
+    local pkg_name="${2:-$1}" 
+    local marker_dir="${XDG_STATE_HOME:-$HOME/.local/state}/zsh_prompts"
+    local marker_file="$marker_dir/${cmd_name}"
+    local install_cmd=""
+
+    # 1. Check if the command is missing and we haven't asked yet
+    if ! command -v "$cmd_name" &> /dev/null && [[ ! -f "$marker_file" ]]; then
+        
+        # 2. Detect the available package manager
+        if command -v brew &> /dev/null; then
+            install_cmd="brew install $pkg_name"
+        elif command -v apt-get &> /dev/null; then
+            install_cmd="sudo apt-get install -y $pkg_name"
+        elif command -v dnf &> /dev/null; then
+            install_cmd="sudo dnf install -y $pkg_name"
+        elif command -v pacman &> /dev/null; then
+            install_cmd="sudo pacman -S --noconfirm $pkg_name"
+        else
+            return 1 
+        fi
+
+        # 3. Prompt the user
+        echo ""
+        if read -q "REPLY?'$cmd_name' is missing. Run '$install_cmd'? [y/N] "; then
+            echo -e "\nInstalling $pkg_name..."
+            eval "$install_cmd"
+        else
+            echo -e "\nSkipping. You won't be asked again."
+        fi
+        
+        # 4. Ensure the directory exists, then create the marker file
+        mkdir -p "$marker_dir"
+        touch "$marker_file"
+    fi
+}
+
+###############################################################################
+# Configure MacOS key bind
+###############################################################################
+if [[ "$OSTYPE" == darwin* ]]; then
+    zstyle ':z4h:bindkey' keyboard  'mac'
 fi
 
-alias ll='ls -FGlAhp'
-alias la='ls -ACF'
+###############################################################################
+# Aliases
+###############################################################################
 
-alias grep='grep --color=auto'
+###
+# `ls`
+#
+# ls - Classify items and use columns
+# ll - "long list", show all items, use human readable values
+# la - Show all items, classify, and use columns
+###
+case "$OSTYPE" in
+    darwin*)
+        # 1. One-time prompt for coreutils
+        prompt_install "gls" "coreutils"
 
+        # 2. Set aliases based on availability
+        if command -v gls &> /dev/null; then
+            alias ls='gls -CF --color=auto --group-directories-first'
+            alias ll='gls -lAhF --color=auto --group-directories-first'
+            alias la='gls -ACF --color=auto --group-directories-first'
+        else
+            # Native macOS BSD fallback
+            alias ls='ls -GCF'
+            alias ll='ls -GlAhp'
+            alias la='ls -GACF'
+        fi
+        ;;
+
+    linux*)
+        # Standard GNU environment
+        alias ls='ls -CF --color=auto --group-directories-first'
+        alias ll='ls -lAhF --color=auto --group-directories-first'
+        alias la='ls -ACF --color=auto --group-directories-first'
+        ;;
+
+    *)
+        # Universal fallback for unknown operating systems
+        alias ls='ls -CF'
+        alias ll='ls -lAhF'
+        alias la='ls -ACF'
+        ;;
+esac
+
+###
+# `cd`
+###
 alias cd..='cd ../'
 alias ..='cd ../'
 alias ...='cd ../../'
@@ -145,114 +233,208 @@ alias .4='cd ../../../../'
 alias .5='cd ../../../../../'
 alias .6='cd ../../../../../../'
 
-alias diff='diff --color=auto -u'
+# Show contents when changing directories
+chpwd() {
+    la
+}
 
-# Add flags to existing aliases.
-#alias ls="${aliases[ls]:-ls} -A"
+###
+# `grep`
+###
+alias grep='grep --color=auto'
+alias egrep='grep -E --color=auto'
+alias fgrep='grep -F --color=auto'
 
-# Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
-setopt glob_dots     # no special treatment for file names with a leading dot
-setopt no_auto_menu  # require an extra TAB press to open the completion menu
+###
+# `tree`
+###
+prompt_install "tree"
+if command -v tree &> /dev/null; then
+    alias tree='tree -a -I .git'
+fi
+
+###
+# `diff`
+###
+case "$OSTYPE" in
+    darwin*)
+        # We need GNU diffutils on Mac for color. It installs as 'gdiff'.
+        prompt_install "gdiff" "diffutils"
+        
+        if command -v gdiff &> /dev/null; then
+            alias diff='gdiff --color=auto -uy'
+        else
+            # Fallback to standard Mac diff without the color flag so it doesn't break
+            alias diff='diff -uy'
+        fi
+        ;;
+
+    linux*)
+        # Linux diff supports color natively. No prompt needed!
+        alias diff='diff --color=auto -uy'
+        ;;
+        
+    *)
+        alias diff='diff -uy'
+        ;;
+esac
 
 ###
 # Git
 ###
-alias gs='git status'
-alias gf='git fetch'
-alias ga='git add .'
-alias gc='git commit -S -m '
+prompt_install "git"
+if command -v git &> /dev/null; then
+    alias gs='git status'
+    alias gf='git fetch'
+    alias ga='git add .'
+    alias gc='git commit -S -m'    
+    alias gl='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+fi
 
 ###
-# Get Public IP
+# IP Addresses (Public & Local)
 ###
-if ! command -v curl &> /dev/null; then
-	echo -e "Consider installing 'curl'\n"
-else
-	alias myip='curl ipinfo.io/ip && echo'
-	alias myIP='myip'
-	alias myIp='myip'
-fi
+prompt_install "curl"
+
+publicip() {
+    if command -v curl &> /dev/null; then
+        echo "public: $(curl -s ipinfo.io/ip)"
+    else
+        echo "Error: 'curl' is required to fetch public IP."
+    fi
+}
+
+localip() {
+    case "$OSTYPE" in
+        darwin*)
+            # macOS uses ifconfig. 
+            ifconfig | awk '/^[a-z0-9]+:/ { sub(/:$/, "", $1); iface=$1 } /inet / && $2 != "127.0.0.1" { print iface":", $2 }'
+            ;;
+        linux*)
+            # -4 restricts to IPv4. 
+            # -o (oneline) formats each interface onto a single line.
+            ip -4 -o addr show | awk '$2 != "lo" {print $2": "$4}'
+            ;;
+        *)
+            echo "Unsupported OS for localip"
+            ;;
+    esac
+}
+
+alias myip='publicip'
+alias myip4='localip'
+alias myips='publicip && localip'
 
 ###
 # View Open Ports
 ###
-if [[ "$OS" == "macos" ]]; then
-	if ! command -v lsof &> /dev/null; then
-		echo -e "Consider installing 'lsof'\n"
-	else
-		alias openports='sudo lsof -iTCP -iUDP -n -P | grep -i "listen"'
-	fi
-elif [[ "$OS" == "debian" ]]; then
-	if ! command -v netstat &> /dev/null; then
-		echo -e "Consider installing 'netstat (net-tools)'\n"
-	elif ! command -v lsof &> /dev/null; then
-		echo -e "Consider installing 'lsof'\n"
-	else
-		alias openports='sudo netstat -tulpn | grep -i "listen" && echo && sudo lsof -i | grep -i "listen"'
-	fi
-fi
-
-###
-# List directory contents upon 'cd'
-###
-cd () { builtin cd "$@"; la; }
+case "$OSTYPE" in
+    linux*)
+        prompt_install "netstat" "net-tools"
+        prompt_install "lsof"
+        if command -v netstat &> /dev/null && command -v lsof &> /dev/null; then
+            alias openports='sudo netstat -tulpn | grep -i "listen" && echo && sudo lsof -i | grep -i "listen"'
+        fi
+        ;;
+    *)
+        # Just use lsof (default on macOS)
+        if command -v lsof &> /dev/null; then
+            alias openports='sudo lsof -iTCP -iUDP -n -P | grep -i "listen"'
+        fi
+        ;;
+esac
 
 ###
 # List user processes
 ###
-my_ps () { ps $@ -u $USER -o pid,%cpu,%mem,start,time,bsdtime,command ; }
+my_ps() { 
+    ps "$@" -u "$USER" -o pid,%cpu,%mem,start,time,command
+}
+
 alias myps="my_ps"
 
 ###
-# nvm / node / npm
+# Safe File Operations
 ###
-NVM_DIR="$HOME/.nvm"
-if [ -d $NVM_DIR ]; then
-	export NVM_DIR
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-fi
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias rm='rm -i'
 
-# ------------------------------------------------------------
-# Laravel / Composer
-# ------------------------------------------------------------
-COMPOSER_BIN="$HOME/.config/composer/vendor/bin"
-if [ -d $COMPOSER_BIN ]; then
-	export PATH="$COMPOSER_BIN:$PATH"
-fi
-
-# ------------------------------------------------------------
-# Go
-# ------------------------------------------------------------
-GO_BIN="/usr/local/go/bin"
-if [ -d $GO_BIN ]; then
-  export PATH="$GO_BIN:$PATH"
-fi
-
-# ------------------------------------------------------------
-# Rust
-# ------------------------------------------------------------
-RUST_BIN="$HOME/.cargo/bin"
-if [ -d $RUST_BIN ]; then
-  export PATH="$RUST_BIN:$PATH"
-fi
-
-# ------------------------------------------------------------
-# GHCup / Haskell / Cabal
-# ------------------------------------------------------------
-GHC_BIN="$HOME/.ghcup/bin"
-CABAL_BIN="$HOME/.cabal/bin"
-if [ -d $GHC_BIN ]; then
-  export PATH="$GHC_BIN:$PATH"
-fi
-if [ -d $CABAL_BIN ]; then
-  export PATH="$CABAL_BIN:$PATH"
-fi
+alias mkdir='mkdir -pv'
 
 ###
+# Disk Usage
+###
+alias df='df -h'
+alias dus='du -sh * | sort -h'
+
+###
+# Replace `top` with `btop`
+###
+prompt_install "btop"
+if command -v btop &> /dev/null; then
+    alias top='btop'
+fi
+
+###############################################################################
+# NVM (lazy loader)
+###############################################################################
+export NVM_DIR="$HOME/.nvm"
+
+# Lazy-load handler
+lazy_nvm_wrapper() {
+    # 1. Capture the command the user actually typed (node, npm, etc.)
+    local cmd="$1"
+    shift
+    
+    # 2. Delete all the placeholder functions so they don't loop
+    unset -f nvm node npm npx yarn pnpm
+    
+    # 3. Actually load NVM
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    
+    # 4. Execute the command the user originally asked for
+    "$cmd" "$@"
+}
+
+# Placeholder functions
+nvm() { lazy_nvm_wrapper nvm "$@" }
+node() { lazy_nvm_wrapper node "$@" }
+npm() { lazy_nvm_wrapper npm "$@" }
+npx() { lazy_nvm_wrapper npx "$@" }
+yarn() { lazy_nvm_wrapper yarn "$@" }
+pnpm() { lazy_nvm_wrapper pnpm "$@" }
+
+###############################################################################
 # Configure SSH Agent
-###
-if [ -z "$SSH_AUTH_SOCK" ]; then
-  eval $(ssh-agent -s)
-fi
+###############################################################################
+case "$OSTYPE" in
+    darwin*)
+        # macOS native launchd handles ssh-agent automatically.
+        # Just ensure you have `AddKeysToAgent yes` and `UseKeychain yes` in your ~/.ssh/config
+        ;;
+        
+    linux*)
+        # Setup a persistent SSH agent to prevent zombie processes
+        SSH_ENV="$HOME/.ssh/agent-environment"
 
+        function start_agent {
+            # Start ssh-agent and write the environment variables to a file
+            ssh-agent | sed 's/^echo/#echo/' > "$SSH_ENV"
+            chmod 600 "$SSH_ENV"
+            . "$SSH_ENV" > /dev/null
+        }
+
+        # If the environment file exists, load it
+        if [ -f "$SSH_ENV" ]; then
+            . "$SSH_ENV" > /dev/null
+            # Check if the process ID listed in the file is actually still running
+            if ! kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
+                start_agent
+            fi
+        else
+            start_agent
+        fi
+        ;;
+esac
