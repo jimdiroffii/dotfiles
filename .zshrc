@@ -262,20 +262,19 @@ case "$OSTYPE" in
         prompt_install "gdiff" "diffutils"
         
         if command -v gdiff &> /dev/null; then
-            alias diff='gdiff --color=auto -uy'
+            alias diff='gdiff --color=auto -ys'
         else
             # Fallback to standard Mac diff without the color flag so it doesn't break
-            alias diff='diff -uy'
+            alias diff='diff -ys'
         fi
         ;;
 
     linux*)
-        # Linux diff supports color natively. No prompt needed!
-        alias diff='diff --color=auto -uy'
+        alias diff='diff --color=auto -ys'
         ;;
         
     *)
-        alias diff='diff -uy'
+        alias diff='diff -ys'
         ;;
 esac
 
