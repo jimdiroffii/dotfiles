@@ -415,25 +415,29 @@ case "$OSTYPE" in
         ;;
         
     linux*)
-        # Setup a persistent SSH agent to prevent zombie processes
-        SSH_ENV="$HOME/.ssh/agent-environment"
+        # 1. If a valid socket already exists (e.g., provided by Cinnamon), do nothing!
+        if [ ! -S "$SSH_AUTH_SOCK" ]; then
+            # Setup a persistent SSH agent to prevent zombie processes
+            SSH_ENV="$HOME/.ssh/agent-environment"
 
-        function start_agent {
-            # Start ssh-agent and write the environment variables to a file
-            ssh-agent | sed 's/^echo/#echo/' > "$SSH_ENV"
-            chmod 600 "$SSH_ENV"
-            . "$SSH_ENV" > /dev/null
-        }
+            function start_agent {
+                # Start ssh-agent and write the environment variables to a file
+                ssh-agent | sed 's/^echo/#echo/' > "$SSH_ENV"
+                chmod 600 "$SSH_ENV"
+                . "$SSH_ENV" > /dev/null
+            }
 
-        # If the environment file exists, load it
-        if [ -f "$SSH_ENV" ]; then
-            . "$SSH_ENV" > /dev/null
-            # Check if the process ID listed in the file is actually still running
-            if ! kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
+            # If the environment file exists, load it
+            if [ -f "$SSH_ENV" ]; then
+                . "$SSH_ENV" > /dev/null
+                # Check if the PID is alive AND if the socket file actually exists
+                if ! kill -0 "$SSH_AGENT_PID" 2>/dev/null || ! [ -S "$SSH_AUTH_SOCK" ]; then
+                    start_agent
+                fi
+            else
                 start_agent
             fi
-        else
-            start_agent
         fi
         ;;
 esac
+
