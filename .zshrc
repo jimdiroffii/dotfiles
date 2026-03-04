@@ -182,6 +182,17 @@ fi
 ###############################################################################
 
 ###
+# Package Managers
+###
+case "$OSTYPE" in
+    linux*)
+        if command -v apt &> /dev/null; then
+            alias saup='sudo apt-get update && sudo apt-get upgrade -y && sudo apt auto-remove'
+				fi
+				;;
+esac
+
+###
 # `ls`
 #
 # ls - Classify items and use columns
