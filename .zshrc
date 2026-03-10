@@ -187,7 +187,7 @@ fi
 case "$OSTYPE" in
     linux*)
         if command -v apt &> /dev/null; then
-            alias saup='sudo apt-get update && sudo apt-get upgrade -y && sudo apt auto-remove'
+            alias saup='sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get autoremove'
 				fi
 				;;
 esac
