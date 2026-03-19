@@ -193,6 +193,17 @@ case "$OSTYPE" in
 esac
 
 ###
+# Hugo
+###
+case "$OSTYPE" in
+    linux*)
+        if command -v hugo &> /dev/null; then
+            alias hugo-audit='HUGO_MINIFY_TDEWOLFF_HTML_KEEPCOMMENTS=true HUGO_ENABLEMISSINGTRANSLATIONPLACEHOLDERS=true hugo && grep -inorE "|ZgotmplZ|\[i18n\]|\(<nil>\)|(&lt;nil&gt;)|hahahugo" public/' 
+        fi
+        ;;
+esac
+
+###
 # `ls`
 #
 # ls - Classify items and use columns
